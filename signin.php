@@ -4,9 +4,9 @@ include('connection.php');
 $username = $_POST['username'];
 $password = $_POST['password'];
 
-$query = $mysqli->prepare('select ID,username,password,F_Name,L_Name
-from users 
-where username=?');
+$query = $mysqli->prepare('SELECT ID, username, password, F_Name, L_Name
+FROM users
+WHERE username = ?');
 $query->bind_param('s', $username);
 $query->execute();
 
@@ -16,16 +16,27 @@ $query->fetch();
 
 $num_rows = $query->num_rows();
 if ($num_rows == 0) {
-    $response['status'] = "user not found";
+    $response = array(
+        'success' => false,
+        'message' => 'User not found',
+    );
 } else {
     if (password_verify($password, $hashed_password)) {
-        $response['status'] = 'logged in';
-        $response['user_id'] = $id;
-        $response['first_name'] = $F_Name;
-        $response['last_name'] = $L_Name;
-        $response['username'] = $username;
+        $response = array(
+            'success' => true,
+            'message' => 'Logged in',
+            'user_id' => $id,
+            'first_name' => $F_Name,
+            'last_name' => $L_Name,
+            'username' => $username,
+        );
     } else {
-        $response['status'] = "wrong password";
+        $response = array(
+            'success' => false,
+            'message' => 'Wrong password',
+        );
     }
 }
+
 echo json_encode($response);
+?>
